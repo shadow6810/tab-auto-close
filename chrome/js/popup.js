@@ -15,9 +15,6 @@ function getHostName(target) {
 			// set the hostName
 			hostName = items.currentHostName;							
 			
-			// handle the blacklist
-			editBlacklist(hostName,target);
-			
 		} else {
 
 			// no hostName, close window		
@@ -27,112 +24,6 @@ function getHostName(target) {
 	});
 }
 
-// get the blacklist
-function editBlacklist(hostName,target) {
-
-	// check storage
-	storage.get('blacklist', function(items) {
-
-		 // pull current hostName from storage
-		if (items.blacklist) {
-	 
-			// get current blacklist
-			var websitesList = items.blacklist;
-		  
-			// parse the blacklist
-			websitesList = JSON.parse(websitesList);
-			
-			// check the type of the list			
-			if (typeof(websitesList) === "string") {
-			
-				// parse the string at spaces
-				var websites = websitesList.split(" ");
-				
-			} else {
-			
-				var websites = websitesList;
-			
-			}
-			
-			// check the target
-			if (target == "red") {
-			
-				// check if already on list
-				if (websites.indexOf(hostName) >= 0) {
-				
-					// close window, already on blacklist
-					window.close();
-				
-				} else {
-				
-					// add hostName to websites
-					websites.push(hostName);
-					
-					// change the icon		
-					chrome.runtime.sendMessage({"message": "blacklistSite"});				
-					
-					// handle the blacklist
-					setBlacklist(websites);
-					
-				}
-							
-			} else {
-
-				// remove all occurrences of hostName from blacklist
-				for (var i=0; i < websites.length; i++){
-
-					if (websites[i] === hostName) websites.splice(i, 1);
-						
-				}
-					
-				// split the domain to check for universal match
-				let splitHostName = hostName.split(".");
-		
-				if (splitHostName.length > 2) {			
-				
-					// check if universal hostname match exists
-					let universalHostName = "*." + splitHostName[1] + "." + splitHostName[2];				
-
-					// remove all universal occurrences of hostName from blacklist
-					for (var j=0; j < websites.length; j++){
-					
-						if (websites[j] === universalHostName) websites.splice(j, 1);
-						
-					}
-
-				}
-				
-				// change the icon		
-				chrome.runtime.sendMessage({"message": "whitelistSite"});				
-					
-				// handle the blacklist
-				setBlacklist(websites);				
-			
-			}						
-			
-		} else {
-
-			// no hostName, close window		
-			window.close();			
-
-		}
-		
-		
-	});
-}
-
-// set the new edited blacklist
-function setBlacklist(websites) {
-	
-	// store the blacklist
-	storage.set({'blacklist': JSON.stringify(websites)}, function() {
-		
-		// close the window
-		window.close();
-				
-	});
-		
-}
 
 // check paused
 function checkPaused() {
@@ -171,22 +62,6 @@ function checkPaused() {
 
 // set the new pause value in storage
 function setPaused(pauseVal) {
-	
-	// store the blacklist
-	storage.set({'paused': pauseVal}, function() {
-						
-		// change the icon		
-		if (pauseVal === "on") {
-		
-			// paused, send message to change icon
-			chrome.runtime.sendMessage({"message": "pause"});									
-		
-		} else {
-		
-			// not paused, send message to change icon
-			chrome.runtime.sendMessage({"message": "whitelistSite"});		
-		
-		}
 		
 		// close the window
 		window.close();
