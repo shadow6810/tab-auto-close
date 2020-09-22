@@ -1,14 +1,8 @@
 // receive message from content script
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-
-	// check if message is blacklist site
-	if ( request.message === "blacklistSite" ) {  
-
-		// change the icon to inactive
-		chrome.browserAction.setIcon({path:"img/iconOff38.png"});
 	
 	// check if message is whitelist site or resume
-	} else if ( request.message === "whitelistSite" ) {  
+	if ( request.message === "whitelistSite" ) {  
 
 		// change the icon to inactive
 		chrome.browserAction.setIcon({path:"img/icon.png"});
